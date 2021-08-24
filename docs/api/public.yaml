@@ -29,7 +29,9 @@ paths:
                 data:
                   type: string
                   format: binary
-                separator:
+                recordSeparator:
+                  type: string
+                valueSeparator:
                   type: string
       responses:
         '200':
