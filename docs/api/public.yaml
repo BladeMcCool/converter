@@ -1,0 +1,41 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: File Converter
+
+paths:
+  /api/v1/{inputFormat}/{outputFormat}:
+    get:
+      summary: Convert a file from one format to another
+      parameters:
+        - in: path
+          name: inputFormat
+          schema:
+            type: integer
+          required: true
+          description: index of input file format from internal file formats list
+        - in: path
+          name: outputFormat
+          schema:
+            type: integer
+          required: true
+          description: index of output file format from internal file formats list
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+                  format: binary
+                separator:
+                  type: string
+      responses:
+        '200':
+          description: Converted output to desired format
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
