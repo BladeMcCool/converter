@@ -1,11 +1,11 @@
 package formats
 
 type formatSpec struct {
-	name string
-	implementation Formatter
+	name           string
+	implementation FormatImporterExporter
 }
 
-type Formatter interface{
+type FormatImporterExporter interface{
 	SetDelimiters(string, string) error
 	Import([]byte) ([]Segment, error)
 	Export([]Segment) []byte

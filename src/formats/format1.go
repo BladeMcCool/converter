@@ -5,26 +5,29 @@ import (
 	"strings"
 )
 
-type Format1Formatter struct {
+type Format1ImporterExporter struct {
 	recordSeparator string
 	valueSeparator string
 }
 
 
-func (f *Format1Formatter) SetDelimiters(recordSeparator, valueSeparator string) {
+func (f *Format1ImporterExporter) SetDelimiters(recordSeparator, valueSeparator string) {
 	f.recordSeparator = recordSeparator
 	f.valueSeparator = valueSeparator
 }
 
-func (f *Format1Formatter) Import(rawData []byte) ([]Segment, error) {
-	//note: given the statements that the 3 different sample inputs are equivalent
-	//      and given that there are actually inconsistencies in the leading/trailing spaces
-	//       - txt vs json/xml for AddressID eg: " 14 " vs " 14"
-	//       - txt vs json/xml for ContactId eg: " 59" vs "59"
+func (f *Format1ImporterExporter) Import(rawData []byte) (segments []Segment, err error) {
+	// given the statements that the 3 different sample inputs formats are equivalent to each other
+	// and given that there are actually inconsistencies in the leading/trailing spaces
+	//  - txt vs json/xml for AddressID eg: " 14 " vs " 14"
+	//  - txt vs json/xml for ContactId eg: " 59" vs "59"
+	// so we will trim the values in order for them to in fact be equivalent.
+	//
+	// if export should use different spaces padding for certain fields depending on the
+	// export type, then that logic will need to be defined clearly before we can accommodate it.
 
 	rawSegments := strings.Split(string(rawData), f.recordSeparator)
 	var hadValidSegment = false
-	segments := []Segment{}
 	for _, rawSegment := range rawSegments {
 		rawValues := strings.Split(rawSegment, f.valueSeparator)
 		if len(rawValues) < 1 {
@@ -48,10 +51,10 @@ func (f *Format1Formatter) Import(rawData []byte) ([]Segment, error) {
 	}
 	if !hadValidSegment { return []Segment{}, errors.New("invalid input: no segments with at least one value were found")}
 
-	return segments, nil
+	return
 }
 
-func (f *Format1Formatter) Export(segments []Segment) []byte {
+func (f *Format1ImporterExporter) Export(segments []Segment) []byte {
 	segmentsExport := []string{}
 	for _, segment := range segments {
 		exportLine := segment.kind + f.valueSeparator + strings.Join(segment.values, f.valueSeparator)

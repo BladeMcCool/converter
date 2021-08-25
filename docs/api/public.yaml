@@ -29,13 +29,17 @@ paths:
                 data:
                   type: string
                   format: binary
-                recordSeparator:
+                inputLineSeparator:
                   type: string
-                valueSeparator:
+                inputElementSeparator:
+                  type: string
+                outputLineSeparator:
+                  type: string
+                outputElementSeparator:
                   type: string
       responses:
         '200':
-          description: Converted output to desired format
+          description: Converted output in desired format
           content:
             application/octet-stream:
               schema:
