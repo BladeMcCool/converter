@@ -66,7 +66,7 @@ var exportMatchTxtFixture = []Segment{{
 }}
 
 func TestFormat1__Import__MatchesExpected(t *testing.T)  {
-	reader, err := os.Open("../testdata/format1_example2.txt")
+	reader, err := os.Open("../testdata/format1_example.txt")
 	require.Nil(t, err)
 	fixtureRawBytes, err := ioutil.ReadAll(reader)
 	formatter := Format1ImporterExporter{}
@@ -166,4 +166,40 @@ func TestFormat3__Import__MatchesExpected(t *testing.T)  {
 
 	require.Nil(t, err)
 	require.Equal(t, importedSegmentsFixture, importedData)
+}
+
+func TestFormat3__Import__BadData__ReportsInvalidInput(t *testing.T) {
+	reader, err := os.Open("../testdata/format3_baddata.xml")
+	require.Nil(t, err)
+	fixtureRawBytes, err := ioutil.ReadAll(reader)
+	formatter := Format3ImporterExporter{}
+	_, err = formatter.Import(fixtureRawBytes)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "invalid input")
+
+	reader, err = os.Open("../testdata/format3_baddata2.xml")
+	require.Nil(t, err)
+	fixtureRawBytes, err = ioutil.ReadAll(reader)
+	_, err = formatter.Import(fixtureRawBytes)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "XML syntax error")
+
+	reader, err = os.Open("../testdata/format3_baddata3.xml")
+	require.Nil(t, err)
+	fixtureRawBytes, err = ioutil.ReadAll(reader)
+	_, err = formatter.Import(fixtureRawBytes)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "invalid input")
+}
+
+
+func TestFormat3__Export__MatchesExpected(t *testing.T)  {
+	formatter := Format3ImporterExporter{}
+	exportedData := formatter.Export(exportMatchJSONAndXMLFixture)
+
+	reader, err := os.Open("../testdata/format3_example.xml")
+	require.Nil(t, err)
+	fixtureRawBytes, _ := ioutil.ReadAll(reader)
+
+	require.Equal(t, string(fixtureRawBytes), string(exportedData))
 }

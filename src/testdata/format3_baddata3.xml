@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Boxes>
+    <Large label="fragile"></Large>
+    <Large label="dangerousgoods"></Large>
+    <Small label="keep chilled"></Small>
+</Boxes>

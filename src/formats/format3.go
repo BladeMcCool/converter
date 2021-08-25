@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
+	"github.com/beevik/etree"
 	"strconv"
 	"strings"
 )
@@ -16,13 +17,16 @@ func (f *Format3ImporterExporter) Import(rawData []byte) (segments []Segment, er
 	var hadValidSegment = false
 
 	tokenparser := xml.NewDecoder(bytes.NewReader(rawData)) //hrm, maybe would be better to keep it as a reader in the first place.
-
-	//reachedRoot := false
 	depth := 0
 	var curSegment Segment
 	for {
-		token, _ := tokenparser.Token()
-		if token == nil { break }
+		token, err := tokenparser.Token()
+		if token == nil {
+			if err != nil && err.Error() != "EOF" {
+				return []Segment{}, err
+			}
+			break
+		}
 		switch element := token.(type) {
 		case xml.StartElement:
 			depth++
@@ -64,8 +68,22 @@ func (f *Format3ImporterExporter) Import(rawData []byte) (segments []Segment, er
 	return
 }
 
-func (f *Format3ImporterExporter) Export(segments []Segment) (xmlExport []byte) {
-	var err error
-	if err != nil { return []byte{} }
-	return
+func (f *Format3ImporterExporter) Export(segments []Segment) []byte {
+	// during research for how to build the document the way i want i encountered a module called etree
+	// using it here due to it being much easier to work with
+	// the import code above can possibly be rewritten to use it too.
+	outBuf := bytes.NewBuffer([]byte{})
+	doc := etree.NewDocument()
+	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8" `)
+	rootEl := doc.CreateElement("root")
+	for _, segment := range segments {
+		segmentEl := rootEl.CreateElement(segment.kind)
+		for i, v := range segment.values {
+			valueEl := segmentEl.CreateElement(segment.kind + strconv.Itoa(i+1))
+			valueEl.SetText(v)
+		}
+	}
+	doc.Indent(0)
+	doc.WriteTo(outBuf)
+	return outBuf.Bytes()
 }
