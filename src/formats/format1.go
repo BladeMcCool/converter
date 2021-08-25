@@ -52,5 +52,10 @@ func (f *Format1Formatter) Import(rawData []byte) ([]Segment, error) {
 }
 
 func (f *Format1Formatter) Export(segments []Segment) []byte {
-	return []byte{}
+	segmentsExport := []string{}
+	for _, segment := range segments {
+		exportLine := segment.kind + f.valueSeparator + strings.Join(segment.values, f.valueSeparator)
+		segmentsExport = append(segmentsExport, exportLine)
+	}
+	return []byte(strings.Join(segmentsExport, f.recordSeparator) + f.recordSeparator)
 }
