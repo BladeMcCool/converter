@@ -155,3 +155,15 @@ func TestFormat2__Export__MatchesExpected(t *testing.T)  {
 
 	require.Equal(t, string(fixtureRemarshalled), string(exportedData))
 }
+
+func TestFormat3__Import__MatchesExpected(t *testing.T)  {
+	reader, err := os.Open("../testdata/format3_example.xml")
+	require.Nil(t, err)
+	fixtureRawBytes, err := ioutil.ReadAll(reader)
+	formatter := Format3ImporterExporter{}
+	importedData, err := formatter.Import(fixtureRawBytes)
+	t.Logf("%# v\n", pretty.Formatter(importedData))
+
+	require.Nil(t, err)
+	require.Equal(t, importedSegmentsFixture, importedData)
+}
