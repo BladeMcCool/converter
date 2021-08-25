@@ -4,7 +4,7 @@ info:
   title: File Converter
 
 paths:
-  /api/v1/{inputFormat}/{outputFormat}:
+  /api/v1/{inputFormat}/{outputFormat}/:
     get:
       summary: Convert a file from one format to another
       parameters:
