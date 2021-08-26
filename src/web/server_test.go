@@ -106,3 +106,4 @@ func Test__Convert__UnknownFormatOut__Responds400(t *testing.T) {
 //  test send no file under data param gives err
 //  test send wrong (mismatched from stated) format gives err
 //  test format1 in w/o separator args gives err (out is covered)
+//  test some other format conversion permutations possibly in a loop to go through them all.

@@ -23,8 +23,6 @@ func (f *Format1ImporterExporter) SetDelimiters(fieldPrefix string, form *url.Va
 	return
 }
 
-
-
 func (f *Format1ImporterExporter) Import(rawData []byte) (segments []Segment, err error) {
 	// given the statements that the 3 different sample inputs formats are equivalent to each other
 	// and given that there are actually inconsistencies in the leading/trailing spaces

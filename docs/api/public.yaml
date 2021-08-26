@@ -13,13 +13,13 @@ paths:
           schema:
             type: integer
           required: true
-          description: index of input file format from internal file formats list
+          description: index+1 of input file format from internal file formats list
         - in: path
           name: outputFormat
           schema:
             type: integer
           required: true
-          description: index of output file format from internal file formats list
+          description: index+1 of output file format from internal file formats list
       requestBody:
         content:
           multipart/form-data:
@@ -41,7 +41,12 @@ paths:
         '200':
           description: Converted output in desired format
           content:
-            application/octet-stream:
+            text/plain:
               schema:
                 type: string
-                format: binary
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string

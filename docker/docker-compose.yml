@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  converter:
+    build:
+      context: ../.
+      dockerfile: Dockerfile
+    ports:
+      - "5445:5445"
