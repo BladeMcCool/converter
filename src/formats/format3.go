@@ -5,13 +5,14 @@ import (
 	"encoding/xml"
 	"errors"
 	"github.com/beevik/etree"
+	"net/url"
 	"strconv"
 	"strings"
 )
 
 type Format3ImporterExporter struct {
 }
-func (f *Format3ImporterExporter) SetDelimiters(_, _ string) {}
+func (f *Format3ImporterExporter) SetDelimiters(_ string, _ *url.Values) (err error) {return}
 
 func (f *Format3ImporterExporter) Import(rawData []byte) (segments []Segment, err error) {
 	var hadValidSegment = false

@@ -2,6 +2,7 @@ package formats
 
 import (
 	"errors"
+	"net/url"
 	"strings"
 )
 
@@ -10,11 +11,19 @@ type Format1ImporterExporter struct {
 	valueSeparator string
 }
 
-
-func (f *Format1ImporterExporter) SetDelimiters(recordSeparator, valueSeparator string) {
-	f.recordSeparator = recordSeparator
-	f.valueSeparator = valueSeparator
+func (f *Format1ImporterExporter) SetDelimiters(fieldPrefix string, form *url.Values) (err error) {
+	lineSep := form.Get(fieldPrefix + "LineSeparator")
+	elSep := form.Get(fieldPrefix + "ElementSeparator")
+	//assuming these cannot be blank...
+	if lineSep == "" || elSep == "" {
+		return errors.New("missing one or more separator")
+	}
+	f.recordSeparator = lineSep
+	f.valueSeparator = elSep
+	return
 }
+
+
 
 func (f *Format1ImporterExporter) Import(rawData []byte) (segments []Segment, err error) {
 	// given the statements that the 3 different sample inputs formats are equivalent to each other

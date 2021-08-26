@@ -3,6 +3,7 @@ package formats
 import (
 	"encoding/json"
 	"errors"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -11,7 +12,7 @@ type jsonFormat map[string]map[string]string
 
 type Format2ImporterExporter struct {
 }
-func (f *Format2ImporterExporter) SetDelimiters(_, _ string) {}
+func (f *Format2ImporterExporter) SetDelimiters(_ string, _ *url.Values) (err error) {return}
 
 func (f *Format2ImporterExporter) Import(rawData []byte) (segments []Segment, err error) {
 	jsonSegments := &jsonFormat{}

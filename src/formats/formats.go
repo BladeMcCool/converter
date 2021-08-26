@@ -1,14 +1,16 @@
 package formats
 
+import "net/url"
+
 type FormatSpec struct {
 	Name               string
 	Mimetype           string
 	RequiresDelimiters bool
-	Implementation     FormatImporterExporter
+	Implementation     func() FormatImporterExporter
 }
 
 type FormatImporterExporter interface{
-	SetDelimiters(string, string) //this naively assumes any format that uses delimiters requires exactly two of them.
+	SetDelimiters(fieldPrefix string, form *url.Values) error
 	Import([]byte) ([]Segment, error)
 	Export([]Segment) []byte
 }
@@ -22,15 +24,15 @@ var FormatSpecs = []FormatSpec{{
 	Name: "Format1",
 	Mimetype: "text/plain",
 	RequiresDelimiters: true,
-	Implementation: &Format1ImporterExporter{},
+	Implementation: func()FormatImporterExporter { return &Format1ImporterExporter{} },
 },{
 	Name: "Format2",
 	Mimetype: "application/json",
-	Implementation: &Format2ImporterExporter{},
+	Implementation: func()FormatImporterExporter { return &Format2ImporterExporter{} },
 },{
 	Name: "Format3",
 	Mimetype: "application/xml",
-	Implementation: &Format3ImporterExporter{},
+	Implementation: func()FormatImporterExporter { return &Format3ImporterExporter{} },
 }}
 
 

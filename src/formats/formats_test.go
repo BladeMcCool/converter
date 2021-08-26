@@ -5,6 +5,7 @@ import (
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"testing"
 )
@@ -65,12 +66,17 @@ var exportMatchTxtFixture = []Segment{{
 	},
 }}
 
-func TestFormat1__Import__MatchesExpected(t *testing.T)  {
+func TestFormat1__Import__MatchesExpected(t *testing.T) {
 	reader, err := os.Open("../testdata/format1_example.txt")
 	require.Nil(t, err)
 	fixtureRawBytes, err := ioutil.ReadAll(reader)
 	formatter := Format1ImporterExporter{}
-	formatter.SetDelimiters("~", "*")
+	//formatter.SetDelimiters("~", "*")
+
+	formatter.SetDelimiters("", &url.Values{
+		"LineSeparator":{"~"},
+		"ElementSeparator":{"*"},
+	})
 	importedData, err := formatter.Import(fixtureRawBytes)
 	t.Logf("%# v\n", pretty.Formatter(importedData))
 
@@ -83,7 +89,10 @@ func TestFormat1__Import__BadData__ReportsInvalidInput(t *testing.T) {
 	require.Nil(t, err)
 	fixtureRawBytes, err := ioutil.ReadAll(reader)
 	formatter := Format1ImporterExporter{}
-	formatter.SetDelimiters("~", "*")
+	formatter.SetDelimiters("", &url.Values{
+		"LineSeparator":{"~"},
+		"ElementSeparator":{"*"},
+	})
 	_, err = formatter.Import(fixtureRawBytes)
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "invalid input")
@@ -91,7 +100,10 @@ func TestFormat1__Import__BadData__ReportsInvalidInput(t *testing.T) {
 
 func TestFormat1__Export__MatchesExpected(t *testing.T)  {
 	formatter := Format1ImporterExporter{}
-	formatter.SetDelimiters("~", "*")
+	formatter.SetDelimiters("", &url.Values{
+		"LineSeparator":{"~"},
+		"ElementSeparator":{"*"},
+	})
 	exportedData := formatter.Export(exportMatchTxtFixture)
 
 	reader, err := os.Open("../testdata/format1_example.txt")
