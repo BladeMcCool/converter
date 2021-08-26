@@ -3,6 +3,7 @@ package web
 import (
 	"bytes"
 	"converter/formats"
+	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
@@ -29,16 +30,25 @@ func ConvertDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setDelimiters("input", &r.PostForm, inputFormat)
-	setDelimiters("output", &r.PostForm, outputFormat)
+	err = setDelimiters("input", &r.PostForm, inputFormat)
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
 
-	var buf bytes.Buffer
+	err = setDelimiters("output", &r.PostForm, outputFormat)
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
 	file, _, err := r.FormFile("data")
 	if err != nil {
 		writeErr(w, err)
 		return
 	}
 	defer file.Close()
+	var buf bytes.Buffer
 	io.Copy(&buf, file)
 
 	segments, err := inputFormat.Implementation.Import(buf.Bytes())
@@ -69,7 +79,7 @@ func getFormat(vars map[string]string, optionField string) (*formats.FormatSpec,
 	return &formats.FormatSpecs[inputFormatIndex-1], nil
 }
 
-func setDelimiters(fieldPrefix string, form *url.Values, formatSpec *formats.FormatSpec) {
+func setDelimiters(fieldPrefix string, form *url.Values, formatSpec *formats.FormatSpec) (err error) {
 	//this method signature is probably a better one for the interface method of similar name,
 	//then the details of which and how many separators could be implementation specific.
 	if !formatSpec.RequiresDelimiters {
@@ -78,7 +88,13 @@ func setDelimiters(fieldPrefix string, form *url.Values, formatSpec *formats.For
 	lineSep := form.Get(fieldPrefix + "LineSeparator")
 	elSep := form.Get(fieldPrefix + "ElementSeparator")
 
+	//assuming formatSpec.RequiresDelimiters is actually a thing...
+	if lineSep == "" || elSep == "" {
+		return errors.New("missing one or more separator")
+	}
+
 	formatSpec.Implementation.SetDelimiters(lineSep, elSep)
+	return
 }
 
 func writeErr(w http.ResponseWriter, err error) {
